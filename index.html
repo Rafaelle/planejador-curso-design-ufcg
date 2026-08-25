@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxograma Interativo — Design UFCG</title>
+<style>
+  :root{
+    --bg:#f7f4ef; --card:#fff; --text:#2d2a28; --muted:#77716b;
+    --border:#ded8d0; --accent:#b65f2a; --accent-soft:#f5e5d9;
+    --ok:#4e8b63; --ok-soft:#e7f1ea; --warn:#a46b25; --warn-soft:#fff1dc;
+    --shadow:0 8px 24px rgba(45,42,40,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  header{padding:28px 24px 20px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+  .header-inner{max-width:1400px;margin:auto}
+  h1{margin:0 0 6px;font-size:26px}
+  .subtitle{color:var(--muted);font-size:14px}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  input[type="search"]{flex:1;min-width:220px;padding:11px 13px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px}
+  button{border:1px solid var(--border);background:#fff;color:var(--text);padding:10px 13px;border-radius:10px;cursor:pointer;font-weight:600}
+  button:hover{background:#faf8f5}
+  .summary{max-width:1400px;margin:18px auto 0;padding:0 24px}
+  .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+  .stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+  main{max-width:1400px;margin:18px auto;padding:0 24px 40px}
+  .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:18px}
+  .level{border-radius:12px;padding:10px 14px;font-weight:800;text-align:center;border:1px solid var(--border);background:#fff}
+  .level.basic{border-top:4px solid #e77d19}.level.mid{border-top:4px solid #ef9a22}.level.advanced{border-top:4px solid #df5965}
+  .period{background:#fff;border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow)}
+  .period-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#faf8f5;border-bottom:1px solid var(--border)}
+  .period-head h2{font-size:16px;margin:0}
+  .period-head span{font-size:12px;color:var(--muted)}
+  .disc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px}
+  .disc{border:2px solid var(--border);border-radius:12px;padding:12px;min-height:120px;background:#fff;cursor:pointer;transition:.15s;position:relative}
+  .disc:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(0,0,0,.07)}
+  .disc.selected{border-color:var(--accent);background:var(--accent-soft)}
+  .disc.completed{border-color:var(--ok);background:var(--ok-soft)}
+  .disc.planned{border-color:#d28b32;background:#fff3df}
+  .disc.blocked{border-color:#c65a5a;background:#fff0f0}
+  .disc.prereq{border-color:var(--warn);background:var(--warn-soft)}
+  .disc.unlocked{border-color:var(--ok);background:var(--ok-soft)}
+  .disc.blocked .disc-name{color:#9e3e3e}
+  .status-buttons{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+  .status-btn{font-size:10px;padding:5px 7px;border-radius:7px}
+  .status-btn.active{font-weight:800}
+  .status-btn.completed{border-color:var(--ok)}
+  .status-btn.planned{border-color:#d28b32}
+  .status-btn.clear{border-color:#bbb}
+  .status-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:0 0 14px}
+  .status-dot{display:inline-flex;align-items:center;gap:5px}
+  .status-dot i{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid #bbb}
+  .status-dot.done i{background:var(--ok-soft);border-color:var(--ok)}
+  .status-dot.plan i{background:#fff3df;border-color:#d28b32}
+  .status-dot.block i{background:#fff0f0;border-color:#c65a5a}
+  .disc-code{font-size:11px;color:var(--muted);font-weight:700}
+  .disc-name{font-weight:800;font-size:14px;line-height:1.2;margin:7px 0}
+  .meta{font-size:11px;color:var(--muted)}
+  .tag{display:inline-block;margin-top:8px;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800}
+  .tag.sel{background:#e8c5ad}.tag.pre{background:#f3d8ad}.tag.open{background:#cfe5d6}
+  .panel{position:fixed;right:18px;bottom:18px;width:min(420px,calc(100vw - 36px));max-height:72vh;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.18);padding:18px;z-index:20;display:none}
+  .panel.show{display:block}
+  .panel h3{margin:0 0 5px;font-size:18px}.panel p{margin:5px 0;color:var(--muted);font-size:12px}
+  .panel-section{margin-top:16px}.panel-section h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .item{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #eee;font-size:13px}
+  .item:last-child{border-bottom:0}
+  .empty{font-size:12px;color:var(--muted)}
+  .close{float:right;border:0;padding:4px 8px;background:transparent}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:0 0 14px}
+  .dot{display:inline-flex;align-items:center;gap:5px}.dot i{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid #bbb}
+  .dot.sel i{background:var(--accent-soft);border-color:var(--accent)} .dot.pre i{background:var(--warn-soft);border-color:var(--warn)} .dot.open i{background:var(--ok-soft);border-color:var(--ok)}
+  .opt{border-style:dashed}
+  @media(max-width:1000px){.disc-grid{grid-template-columns:repeat(3,1fr)}.summary-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:700px){.levels{grid-template-columns:1fr}.disc-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:470px){.disc-grid{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1>Fluxograma Interativo — Design UFCG</h1>
+    <div class="subtitle">Marque o que você já cursou e o que pretende cursar. A aplicação mostra automaticamente o que está liberado e o que está bloqueado por pré-requisito.</div>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Buscar disciplina...">
+      <button onclick="clearSelection()">Limpar seleção</button>
+      <button onclick="selectAllPrereqs()">Selecionar pré-requisitos</button>
+    </div>
+  </div>
+</header>
+
+<div class="summary">
+  <div class="summary-grid">
+    <div class="stat"><strong id="selectedCount">0</strong><span>quero cursar</span></div>
+    <div class="stat"><strong id="hours">0h</strong><span>carga horária selecionada</span></div>
+    <div class="stat"><strong id="prereqCount">0</strong><span>pré-requisitos ainda faltando</span></div>
+    <div class="stat"><strong id="opensCount">0</strong><span>disciplinas que posso liberar</span></div>
+  </div>
+</div>
+
+<main>
+  <div class="levels">
+    <div class="level basic">NÍVEL BÁSICO · 1º–3º período</div>
+    <div class="level mid">NÍVEL INTERMEDIÁRIO · 4º–5º período</div>
+    <div class="level advanced">NÍVEL AVANÇADO · 6º–7º período</div>
+  </div>
+
+  <div class="status-legend">
+    <span class="status-dot done"><i></i> já cursei</span>
+    <span class="status-dot plan"><i></i> quero cursar</span>
+    <span class="status-dot block"><i></i> bloqueada por pré-requisito</span>
+  </div>
+  <div class="legend">
+    <span class="dot pre"><i></i> pré-requisito</span>
+    <span class="dot open"><i></i> disciplina que será aberta</span>
+  </div>
+
+  <div id="app"></div>
+</main>
+
+<aside id="panel" class="panel">
+  <button class="close" onclick="closePanel()">✕</button>
+  <h3 id="panelTitle"></h3>
+  <p id="panelMeta"></p>
+  <div class="panel-section">
+    <h4>Pré-requisitos diretos</h4>
+    <div id="panelPrereqs"></div>
+  </div>
+  <div class="panel-section">
+    <h4>O que esta disciplina abre</h4>
+    <div id="panelOpens"></div>
+  </div>
+  <div class="panel-section">
+    <h4>Cadeia de pré-requisitos</h4>
+    <div id="panelChain"></div>
+  </div>
+</aside>
+
+<script>
+const D = [
+  // período, grupo, código, nome, créditos, horas, prereqs
+  [1,'A','A1','Projeto I',4,60,[]],[1,'B','B1','Desenho I',4,60,[]],[1,'C','C1','História da Arte e do Design',4,60,[]],
+  [1,'D','D1','Expressão Gráfica',4,60,[]],[1,'E','E1','Expressão Tridimensional I',4,60,[]],[1,'F','F1','Materiais e Processos de Fabricação I',4,60,[]],
+  [1,'G','G1','Técnicas de Apresentação de Projeto I',2,30,[]],
+
+  [2,'A','A2','Projeto II',4,60,['A1']],[2,'B','B2','Desenho II',4,60,['B1']],[2,'C','C2','História do Design Industrial',2,30,['C1']],
+  [2,'D','D2','Desenho Técnico',4,60,['D1']],[2,'E','E2','Expressão Tridimensional II',4,60,['E1']],[2,'F','F2','Materiais e Processos de Fabricação II',4,60,['F1']],
+  [2,'G','G2','Registro e Análise da Imagem',4,60,[]],
+
+  [3,'A','A3','Projeto III',4,60,['A2']],[3,'B','B3','Computação Gráfica',4,60,['B2']],[3,'C','C3','Análise da Forma',4,60,[]],
+  [3,'D','D3','Teoria e Prática da Cor',4,60,[]],[3,'E','E3','Modelos Tridimensionais',4,60,['E2']],[3,'F','F3','Metodologia de Projeto',4,60,[]],
+  [3,'G','G3','Técnicas de Apresentação de Projeto II',2,30,['G1','G2']],
+
+  [4,'A','A4','Projeto IV',4,60,['A3']],[4,'B','B4','Desenho Assistido por Computador I',4,60,['B3']],[4,'C','C4','Metodologia Visual',6,90,['C3']],
+  [4,'D','D4','Introdução à Sociologia e Antropologia',4,60,[]],[4,'E','E4','Ergonomia',4,60,[]],[4,'F','F4','Metodologia Científica',2,30,[]],
+
+  [5,'A','A5','Projeto V',4,60,['A4']],[5,'B','B5','Desenho Assistido por Computador II',4,60,['B4']],[5,'C','C5','Estética',4,60,[]],
+  [5,'D','D5','Semiótica e Semântica do Produto',4,60,[]],[5,'E','E5','Interação Usuário - Produto',4,60,['E4']],[5,'F','F5','Inovação em Design',4,60,[]],
+
+  [6,'A','A6','Projeto VI',4,60,['A5']],[6,'B','B6','Desenho Avançado',4,60,['B5']],[6,'C','C6','Teorias do Design',4,60,[]],
+  [6,'D','D6','Empreendedorismo',4,60,[]],[6,'E','E6','Projeto de TCC',2,30,['A5']],[6,'F','F6','Cultura Material',4,60,[]],
+  [6,'G','G6','Optativa',4,60,[]],
+
+  [7,'A','A7','Trabalho de Conclusão de Curso',8,120,['A6','E6']],[7,'B','B7','Optativa',4,60,[]],[7,'C','C7','Optativa',4,60,[]]
+];
+
+const electives = [
+  ['Design e Ecologia',4,60],['Design e Desenvolvimento',4,60],['Design e Emoção',4,60],
+  ['Semântica e Design',4,60,['D5']],['Design Urbano I',4,60],['Design Urbano II',4,60,['Design Urbano I','A5']],
+  ['Design Estratégico',4,60],['Marketing Aplicado ao Design',4,60],['Gestão Integrada do Design',4,60],['LIBRAS',4,60]
+];
+
+const byCode = Object.fromEntries(D.map(x=>[x[2],x]));
+const dependents = {};
+D.forEach(x => x[6].forEach(p => (dependents[p] ??= []).push(x[2])));
+
+let completed = new Set(); // disciplinas já cursadas/aprovadas
+let planned = new Set();   // disciplinas que pretende cursar
+let focused = null;
+
+function status(code){
+  if(completed.has(code)) return 'completed';
+  if(planned.has(code)) return 'planned';
+  return 'none';
+}
+
+function missingPrereqs(code){
+  const d = byCode[code];
+  if(!d) return [];
+  return (d[6] || []).filter(p => !completed.has(p));
+}
+
+function isBlocked(code){
+  return planned.has(code) && missingPrereqs(code).length > 0;
+}
+
+function getAllPrereqs(code, result=new Set()){
+  const d=byCode[code];
+  if(!d) return result;
+  (d[6]||[]).forEach(p=>{
+    if(!result.has(p)){
+      result.add(p);
+      getAllPrereqs(p,result);
+    }
+  });
+  return result;
+}
+
+function render(){
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  for(let p=1;p<=7;p++){
+    const items=D.filter(x=>x[0]===p && (!q || x[3].toLowerCase().includes(q) || x[2].toLowerCase().includes(q)));
+    if(!items.length) continue;
+
+    const sec=document.createElement('section');
+    sec.className='period';
+    const level=p<=3?'Básico':p<=5?'Intermediário':'Avançado';
+
+    sec.innerHTML=`<div class="period-head"><h2>${p}º período</h2><span>${level} · ${items.reduce((s,x)=>s+x[5],0)}h no conjunto exibido</span></div>`;
+
+    const grid=document.createElement('div');
+    grid.className='disc-grid';
+
+    items.forEach(x=>{
+      const [per,g,code,name,cr,h,prs]=x;
+      const el=document.createElement('div');
+      el.className='disc';
+
+      const st=status(code);
+      if(st==='completed') el.classList.add('completed');
+      if(st==='planned') el.classList.add('planned');
+      if(isBlocked(code)) el.classList.add('blocked');
+
+      const isPre=[...planned].some(s=>(byCode[s]?.[6]||[]).includes(code));
+      const opens=(dependents[code]||[]).some(c=>planned.has(c) || completed.has(c));
+
+      if(isPre && st==='none') el.classList.add('prereq');
+      if(opens && st==='none') el.classList.add('unlocked');
+
+      let statusTag='';
+      if(st==='completed') statusTag='<span class="tag open">JÁ CURSEI</span>';
+      if(st==='planned' && !isBlocked(code)) statusTag='<span class="tag sel">QUERO CURSAR</span>';
+      if(isBlocked(code)) statusTag='<span class="tag pre">BLOQUEADA</span>';
+
+      const missing=missingPrereqs(code);
+      const missingText=missing.length
+        ? `<div class="meta" style="margin-top:5px;color:#a03f3f"><strong>Falta:</strong> ${missing.map(c=>byCode[c]?.[3]||c).join(', ')}</div>`
+        : '';
+
+      el.innerHTML=`
+        <div class="disc-code">${code} · ${cr} créditos · ${h}h</div>
+        <div class="disc-name">${name}</div>
+        <div class="meta">${prs.length?`PR: ${prs.join(', ')}`:'Sem pré-requisito'}</div>
+        ${missingText}
+        ${statusTag}
+        <div class="status-buttons">
+          <button class="status-btn completed ${st==='completed'?'active':''}" onclick="setStatus(event,'${code}','completed')">✓ Já cursei</button>
+          <button class="status-btn planned ${st==='planned'?'active':''}" onclick="setStatus(event,'${code}','planned')">＋ Quero cursar</button>
+          ${st!=='none'?`<button class="status-btn clear" onclick="setStatus(event,'${code}','none')">Limpar</button>`:''}
+        </div>`;
+
+      el.onclick=(e)=>{
+        if(e.target.tagName==='BUTTON') return;
+        focused=code;
+        showPanel(code);
+      };
+
+      grid.appendChild(el);
+    });
+
+    sec.appendChild(grid);
+    app.appendChild(sec);
+  }
+
+  updateStats();
+}
+
+function setStatus(event, code, newStatus){
+  event.stopPropagation();
+
+  completed.delete(code);
+  planned.delete(code);
+
+  if(newStatus==='completed') completed.add(code);
+  if(newStatus==='planned') planned.add(code);
+
+  focused=code;
+  showPanel(code);
+  render();
+}
+
+function showPanel(code){
+  const d=byCode[code];
+  if(!d)return;
+
+  document.getElementById('panel').classList.add('show');
+  document.getElementById('panelTitle').textContent=`${code} — ${d[3]}`;
+  document.getElementById('panelMeta').textContent=`${d[0]}º período · ${d[4]} créditos · ${d[5]}h`;
+
+  const pre=d[6]||[];
+  document.getElementById('panelPrereqs').innerHTML=pre.length
+    ? pre.map(c=>{
+        const state=completed.has(c)?'✓ Já cursei':planned.has(c)?'🟡 Quero cursar':'⚠ Ainda não cursada';
+        return row(byCode[c],state);
+      }).join('')
+    : '<div class="empty">Não há pré-requisito indicado no fluxograma.</div>';
+
+  const opens=dependents[code]||[];
+  document.getElementById('panelOpens').innerHTML=opens.length
+    ? opens.map(c=>{
+        const state=isBlocked(c)?'🔴 Bloqueada':completed.has(c)?'✓ Já cursada':planned.has(c)?'🟡 Planejada':'🟢 Liberável';
+        return row(byCode[c],state);
+      }).join('')
+    : '<div class="empty">Nenhuma disciplina possui esta disciplina como pré-requisito direto.</div>';
+
+  const chain=[...getAllPrereqs(code)].reverse();
+  document.getElementById('panelChain').innerHTML=chain.length
+    ? chain.map(c=>{
+        const state=completed.has(c)?'✓ Cursada':planned.has(c)?'🟡 Planejada':'🔴 Falta cursar';
+        return row(byCode[c],state);
+      }).join('')
+    : '<div class="empty">Esta disciplina não possui uma cadeia de pré-requisitos.</div>';
+}
+
+function row(d,state=''){
+  if(!d) return '';
+  return `<div class="item"><span><strong>${d[2]}</strong> — ${d[3]}</span><span>${state||d[5]+'h'}</span></div>`;
+}
+
+function closePanel(){
+  document.getElementById('panel').classList.remove('show');
+}
+
+function clearSelection(){
+  completed.clear();
+  planned.clear();
+  closePanel();
+  render();
+}
+
+function selectAllPrereqs(){
+  const need=new Set();
+  planned.forEach(c=>{
+    (byCode[c]?.[6]||[]).forEach(p=>{
+      if(!completed.has(p)) need.add(p);
+    });
+  });
+  need.forEach(c=>planned.add(c));
+  render();
+}
+
+function updateStats(){
+  const completedArr=[...completed].map(c=>byCode[c]).filter(Boolean);
+  const plannedArr=[...planned].map(c=>byCode[c]).filter(Boolean);
+
+  const need=new Set();
+  const opens=new Set();
+
+  planned.forEach(c=>{
+    (byCode[c]?.[6]||[]).forEach(p=>{
+      if(!completed.has(p)) need.add(p);
+    });
+    (dependents[c]||[]).forEach(x=>{
+      if(!planned.has(x) && !completed.has(x)) opens.add(x);
+    });
+  });
+
+  document.getElementById('selectedCount').textContent=plannedArr.length;
+  document.getElementById('hours').textContent=plannedArr.reduce((s,d)=>s+d[5],0)+'h';
+  document.getElementById('prereqCount').textContent=need.size;
+  document.getElementById('opensCount').textContent=opens.size;
+}
+
+document.getElementById('search').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
