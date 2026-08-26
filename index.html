@@ -1044,6 +1044,20 @@ main,
   border-radius:6px;
 }
 
+.disc.postponed {
+  border: 2px solid #9f99e1;
+  background: #b9b2e2;
+  box-shadow: 0 3px 10px rgba(164, 107, 37, 0.12);
+}
+.disc.postponed .disc-code {
+  color: #6b3dba;
+}
+
+.status-btn.postponed.active {
+  background: #7762c5;
+  color: white;
+  border-color: #9d62c5;
+}
 @media(max-width:1100px){
 
   .disc-grid{
@@ -1245,7 +1259,7 @@ main,
 
 
 <!-- =====================================================
-     MAPA
+     MAPA DE PRÉ-REQUISITOS
 ===================================================== -->
 
 <section id="tab-mapa" class="tab-content active">
@@ -1393,9 +1407,7 @@ main,
 
 
 <!-- =====================================================
-     OFERTADAS
-     IMPORTANTE:
-     ESTA ABA É INDEPENDENTE DO PLANEJADOR
+     DISCIPLINAS OFERTADAS
 ===================================================== -->
 
 <section id="tab-ofertadas" class="tab-content">
@@ -1467,8 +1479,12 @@ main,
 
           O planejador usa as disciplinas marcadas como
           <strong>“Já cursei”</strong> no Fluxograma.
+
+          <br><br>
+
           As disciplinas que você apenas marcou como
-          “Quero cursar” ainda serão consideradas pendentes.
+          <strong>“Quero cursar”</strong> ainda serão
+          consideradas pendentes.
 
         </div>
 
@@ -1611,7 +1627,7 @@ main,
 
 
 <!-- =====================================================
-     PAINEL
+     PAINEL LATERAL DA DISCIPLINA
 ===================================================== -->
 
 <aside id="panel" class="panel">
@@ -1664,7 +1680,7 @@ main,
 
 
 <!-- =====================================================
-     MODAL OFERTAS
+     MODAL — DISCIPLINAS OFERTADAS
 ===================================================== -->
 
 <div id="oferta-modal" class="modal">
@@ -1675,12 +1691,12 @@ main,
 
       <div>
 
-        <h2>
+        <h2 id="oferta-modal-title">
           Adicionar disciplina ofertada
         </h2>
 
         <p>
-          Cadastre turmas e horários.
+          Cadastre as turmas, professores, salas e horários.
         </p>
 
       </div>
@@ -1697,38 +1713,64 @@ main,
 
     <div class="modal-body">
 
+      <!-- DISCIPLINA -->
+
       <div class="form-group">
 
-        <label>
+        <label for="oferta-disciplina">
           Disciplina
         </label>
 
-        <select id="oferta-disciplina"></select>
+        <select id="oferta-disciplina">
+          <option value="">
+            Selecione uma disciplina
+          </option>
+        </select>
+
+      </div>
+
+
+      <!-- TURMAS -->
+
+      <div class="oferta-section-header">
+
+        <div>
+
+          <h3>Turmas</h3>
+
+          <p>
+            Cadastre as turmas disponíveis para esta disciplina.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="secondary-btn"
+          onclick="addTurmaForm()"
+        >
+          + Adicionar turma
+        </button>
 
       </div>
 
 
       <div id="turmas-form"></div>
 
-
-      <button
-        type="button"
-        onclick="addTurmaForm()"
-        style="margin-top:15px"
-      >
-        + Adicionar turma
-      </button>
-
     </div>
 
 
     <div class="modal-footer">
 
-      <button onclick="closeOfertaModal()">
+      <button
+        type="button"
+        onclick="closeOfertaModal()"
+      >
         Cancelar
       </button>
 
       <button
+        type="button"
         class="primary-btn"
         onclick="saveOferta()"
       >
@@ -1802,20 +1844,114 @@ const D = [
 
 ];
 
-
 const electives = [
-  ['Design e Ecologia',4,60,[]],
-  ['Design e Desenvolvimento',4,60,[]],
-  ['Design e Emoção',4,60,[]],
-  ['Semântica e Design',4,60,['D5']],
-  ['Design Urbano I',4,60,[]],
-  ['Design Urbano II',4,60,['Design Urbano I','A5']],
-  ['Design Estratégico',4,60,[]],
-  ['Marketing Aplicado ao Design',4,60,[]],
-  ['Gestão Integrada do Design',4,60,[]],
-  ['LIBRAS',4,60,[]]
+
+  {
+    codigo: '1112255',
+    nome: 'Design e Ecologia',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  },
+
+  {
+    codigo: '1112256',
+    nome: 'Design e Desenvolvimento',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  },
+
+  {
+    codigo: '1112257',
+    nome: 'Design e Emoção',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  },
+
+  {
+    codigo: '1112258',
+    nome: 'Semântica e Design',
+    creditos: 4,
+    horas: 60,
+    prereqs: ['D5']
+  },
+
+  {
+    codigo: '1112259',
+    nome: 'Design Urbano I',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  },
+
+  {
+    codigo: '1112260',
+    nome: 'Design Urbano II',
+    creditos: 4,
+    horas: 60,
+    prereqs: ['1112259', 'A5']
+  },
+
+  {
+    codigo: '1112261',
+    nome: 'Design Estratégico',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  },
+
+  {
+    codigo: '1112262',
+    nome: 'Marketing Aplicado ao Design',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  },
+
+  {
+    codigo: '1112263',
+    nome: 'Gestão Integrada do Design',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  },
+
+  {
+    codigo: '1304207',
+    nome: 'LIBRAS',
+    creditos: 4,
+    horas: 60,
+    prereqs: []
+  }
+
 ];
 
+
+
+const ATIVIDADES_COMPLEMENTARES = [
+  {
+    tipo: 'Estágio',
+    horasFixas: false
+  },
+  {
+    tipo: 'Pesquisa — por projeto',
+    horasFixas: 120
+  },
+  {
+    tipo: 'Extensão — por projeto',
+    horasFixas: 60
+  },
+  {
+    tipo: 'Monitoria — por semestre',
+    horasFixas: 30
+  },
+  {
+    tipo: 'Outras atividades — Resolução 01/2013',
+    horasFixas: false
+  }
+];
 
 const byCode = Object.fromEntries(
   D.map(d => [d[2],d])
@@ -1844,9 +1980,23 @@ D.forEach(d => {
    ESTADO
 ===================================================== */
 
-let completed = new Set();
+let completed = new Set(
+  JSON.parse(
+    localStorage.getItem('ufcg_completed') || '[]'
+  )
+);
 
-let planned = new Set();
+let planned = new Set(
+  JSON.parse(
+    localStorage.getItem('ufcg_planned') || '[]'
+  )
+);
+
+let postponed = new Set(
+  JSON.parse(
+    localStorage.getItem('ufcg_postponed') || '[]'
+  )
+);
 
 let focused = null;
 
@@ -1855,12 +2005,26 @@ let mapFocused = null;
 
 /* =====================================================
    OFERTAS
-   FICA EXISTINDO, MAS NÃO É USADA PELO PLANEJADOR
 ===================================================== */
 
-let ofertas = JSON.parse(
-  localStorage.getItem('ufcg_ofertas') || '[]'
+const OFERTAS_INICIAIS = {
+  "2026.2": [
+    // As turmas de 2026.2 serão colocadas aqui
+  ]
+};
+
+let ofertasPorPeriodo = JSON.parse(
+  localStorage.getItem('ufcg_ofertas_periodos') || 'null'
 );
+
+if(!ofertasPorPeriodo){
+  ofertasPorPeriodo = OFERTAS_INICIAIS;
+
+  localStorage.setItem(
+    'ufcg_ofertas_periodos',
+    JSON.stringify(ofertasPorPeriodo)
+  );
+}
 
 
 /* =====================================================
@@ -1926,6 +2090,10 @@ function status(code){
 
   if(planned.has(code)){
     return 'planned';
+  }
+
+  if(postponed.has(code)){
+    return 'postponed';
   }
 
   return 'none';
@@ -2124,6 +2292,9 @@ function render(){
         el.classList.add('blocked');
       }
 
+      if(st === 'postponed'){
+  el.classList.add('postponed');
+}
 
       const isPre =
         [...planned].some(c =>
@@ -2171,7 +2342,12 @@ function render(){
           '<span class="tag pre">BLOQUEADA</span>';
 
       }
+else if(st === 'postponed'){
 
+  tag =
+    '<span class="tag postponed">ADIADA</span>';
+
+}
 
       const missing =
         missingPrereqs(code);
@@ -2198,8 +2374,10 @@ function render(){
         ${
           missing.length
             ? `
-              <div class="meta"
-                   style="color:#a03f3f">
+              <div
+                class="meta"
+                style="color:#a03f3f"
+              >
                 <strong>Falta:</strong>
                 ${missing
                   .map(c => byCode[c]?.[3] || c)
@@ -2226,6 +2404,20 @@ function render(){
           >
             ＋ Quero cursar
           </button>
+
+         <button
+    class="status-btn postponed ${st==='postponed'?'active':''}"
+    onclick="setStatus(event,'${code}','postponed')"
+  >
+    Quero adiar
+  </button>
+
+          <button
+    class="status-btn details"
+    onclick="openDisciplineDetails(event,'${code}')"
+  >
+    Ver pré-requisitos
+  </button>
 
           ${
             st !== 'none'
@@ -2273,58 +2465,70 @@ function render(){
   updateStats();
 
 }
-
-
-function setStatus(
-  event,
-  code,
-  newStatus
-){
+function setStatus(event, code, newStatus){
 
   event.stopPropagation();
 
-
+  // Remove o código de todos os estados
   completed.delete(code);
-
   planned.delete(code);
+  postponed.delete(code);
 
-
+  // Adiciona ao novo estado
   if(newStatus === 'completed'){
     completed.add(code);
   }
-
 
   if(newStatus === 'planned'){
     planned.add(code);
   }
 
 
-  focused = code;
 
-  showPanel(code);
+  // Salva todos os estados
+  localStorage.setItem(
+    'ufcg_completed',
+    JSON.stringify([...completed])
+  );
+
+  localStorage.setItem(
+    'ufcg_planned',
+    JSON.stringify([...planned])
+  );
+
+  localStorage.setItem(
+    'ufcg_postponed',
+    JSON.stringify([...postponed])
+  );
 
   render();
 
   generatePlanner();
-
 }
-
-
 function clearSelection(){
 
   completed.clear();
-
   planned.clear();
+  postponed.clear();
+
+  localStorage.removeItem(
+    'ufcg_completed'
+  );
+
+  localStorage.removeItem(
+    'ufcg_planned'
+  );
+
+  localStorage.removeItem(
+    'ufcg_postponed'
+  );
 
   closePanel();
 
   render();
 
   generatePlanner();
-
 }
-
-
 function selectAllPrereqs(){
 
   const need = new Set();
@@ -2346,10 +2550,19 @@ function selectAllPrereqs(){
 
   need.forEach(c => planned.add(c));
 
+
+  // Salva no localStorage
+  localStorage.setItem(
+    'ufcg_planned',
+    JSON.stringify([...planned])
+  );
+
+
   render();
 
-}
+  generatePlanner();
 
+}
 
 function updateStats(){
 
@@ -3086,7 +3299,7 @@ function clearMapSelection(){
 
 
 /* =====================================================
-   BUSCA MAPA
+   BUSCA DO MAPA
 ===================================================== */
 
 document
@@ -3127,7 +3340,6 @@ document
 
 /* =====================================================
    OFERTADAS
-   TOTALMENTE INDEPENDENTE DO PLANEJADOR
 ===================================================== */
 
 function preencherSelectDisciplinas(){
@@ -3163,7 +3375,7 @@ function preencherSelectDisciplinas(){
 }
 
 
-function openOfertaModal(codigo=null){
+function openOfertaModal(codigo = null){
 
   preencherSelectDisciplinas();
 
@@ -3173,41 +3385,61 @@ function openOfertaModal(codigo=null){
   ).innerHTML = '';
 
 
-  document
-    .getElementById('oferta-modal')
-    .classList.add('show');
+  const title =
+    document.getElementById(
+      'oferta-modal-title'
+    );
 
 
   if(codigo){
 
+    title.textContent =
+      'Editar disciplina ofertada';
+
+
     const oferta =
       ofertas.find(
-        x => x.disciplina === codigo
+        x =>
+          x.disciplina === codigo
       );
+
+
+    document.getElementById(
+      'oferta-disciplina'
+    ).value = codigo;
 
 
     if(oferta){
 
-      document.getElementById(
-        'oferta-disciplina'
-      ).value = codigo;
-
-
       oferta.turmas.forEach(
-        turma => addTurmaForm(turma)
+        turma =>
+          addTurmaForm(turma)
       );
+
+    }
+    else{
+
+      addTurmaForm();
 
     }
 
   }
   else{
 
+    title.textContent =
+      'Adicionar disciplina ofertada';
+
+
     addTurmaForm();
 
   }
 
-}
 
+  document
+    .getElementById('oferta-modal')
+    .classList.add('show');
+
+}
 
 function closeOfertaModal(){
 
@@ -3218,36 +3450,41 @@ function closeOfertaModal(){
 }
 
 
-function addTurmaForm(dados=null){
+function addTurmaForm(dados = null){
 
   const container =
-    document.getElementById(
-      'turmas-form'
-    );
+    document.getElementById('turmas-form');
 
 
   const turma =
     document.createElement('div');
 
 
-  turma.className =
-    'turma-form';
+  turma.className = 'turma-form';
 
 
   turma.innerHTML = `
 
     <div class="turma-form-header">
 
-      <strong>
-        Nova turma
-      </strong>
+      <div>
+
+        <h4>
+          Turma
+        </h4>
+
+        <span>
+          Informações da turma
+        </span>
+
+      </div>
 
       <button
         type="button"
         class="danger-btn"
         onclick="this.closest('.turma-form').remove()"
       >
-        Remover
+        Remover turma
       </button>
 
     </div>
@@ -3257,10 +3494,14 @@ function addTurmaForm(dados=null){
 
       <div class="turma-field">
 
-        <label>Turma</label>
+        <label>
+          Código da turma
+        </label>
 
         <input
+          type="text"
           class="turma-codigo"
+          placeholder="Ex.: 01"
           value="${dados?.codigo || ''}"
         >
 
@@ -3269,10 +3510,14 @@ function addTurmaForm(dados=null){
 
       <div class="turma-field">
 
-        <label>Professor</label>
+        <label>
+          Professor
+        </label>
 
         <input
+          type="text"
           class="turma-professor"
+          placeholder="Nome do professor"
           value="${dados?.professor || ''}"
         >
 
@@ -3281,10 +3526,14 @@ function addTurmaForm(dados=null){
 
       <div class="turma-field">
 
-        <label>Sala</label>
+        <label>
+          Sala
+        </label>
 
         <input
+          type="text"
           class="turma-sala"
+          placeholder="Ex.: Sala 204"
           value="${dados?.sala || ''}"
         >
 
@@ -3293,29 +3542,49 @@ function addTurmaForm(dados=null){
     </div>
 
 
-    <div class="horarios-header">
+    <!-- HORÁRIOS -->
 
-      <strong>
-        Horários
-      </strong>
+    <div class="horarios-section">
 
-      <button
-        type="button"
-        onclick="addHorarioForm(this)"
-      >
-        + Adicionar horário
-      </button>
+      <div class="horarios-header">
+
+        <div>
+
+          <strong>
+            Horários
+          </strong>
+
+          <span>
+            Adicione todos os dias em que a turma acontece.
+          </span>
+
+        </div>
+
+        <button
+          type="button"
+          class="secondary-btn small"
+          onclick="addHorarioForm(this)"
+        >
+          + Adicionar horário
+        </button>
+
+      </div>
+
+
+      <div class="horarios-form-list"></div>
 
     </div>
-
-
-    <div class="horarios-form-list"></div>
 
   `;
 
 
   container.appendChild(turma);
 
+
+  /*
+   * Se estiver editando uma turma existente,
+   * recria os horários.
+   */
 
   if(
     dados?.horarios &&
@@ -3336,6 +3605,11 @@ function addTurmaForm(dados=null){
   }
   else{
 
+    /*
+     * Toda nova turma começa
+     * com um horário.
+     */
+
     addHorarioForm(
       turma.querySelector(
         '.horarios-header button'
@@ -3346,59 +3620,100 @@ function addTurmaForm(dados=null){
 
 }
 
-
-function addHorarioForm(button,dados=null){
+function addHorarioForm(button, dados = null){
 
   const turma =
     button.closest('.turma-form');
 
 
   const lista =
-    turma.querySelector(
-      '.horarios-form-list'
-    );
+    turma.querySelector('.horarios-form-list');
 
 
   const horario =
     document.createElement('div');
 
 
-  horario.className =
-    'horario-form';
+  horario.className = 'horario-form';
 
 
   horario.innerHTML = `
 
-    <select class="horario-dia">
+    <div class="horario-field">
 
-      <option value="">Dia</option>
-      <option value="segunda">Segunda-feira</option>
-      <option value="terca">Terça-feira</option>
-      <option value="quarta">Quarta-feira</option>
-      <option value="quinta">Quinta-feira</option>
-      <option value="sexta">Sexta-feira</option>
-      <option value="sabado">Sábado</option>
+      <label>
+        Dia
+      </label>
 
-    </select>
+      <select class="horario-dia">
+
+        <option value="">
+          Selecione
+        </option>
+
+        <option value="segunda">
+          Segunda-feira
+        </option>
+
+        <option value="terca">
+          Terça-feira
+        </option>
+
+        <option value="quarta">
+          Quarta-feira
+        </option>
+
+        <option value="quinta">
+          Quinta-feira
+        </option>
+
+        <option value="sexta">
+          Sexta-feira
+        </option>
+
+        <option value="sabado">
+          Sábado
+        </option>
+
+      </select>
+
+    </div>
 
 
-    <input
-      type="time"
-      class="horario-inicio"
-      value="${dados?.inicio || ''}"
-    >
+    <div class="horario-field">
+
+      <label>
+        Início
+      </label>
+
+      <input
+        type="time"
+        class="horario-inicio"
+        value="${dados?.inicio || ''}"
+      >
+
+    </div>
 
 
-    <input
-      type="time"
-      class="horario-fim"
-      value="${dados?.fim || ''}"
-    >
+    <div class="horario-field">
+
+      <label>
+        Fim
+      </label>
+
+      <input
+        type="time"
+        class="horario-fim"
+        value="${dados?.fim || ''}"
+      >
+
+    </div>
 
 
     <button
       type="button"
       class="icon-btn"
+      title="Remover horário"
       onclick="this.closest('.horario-form').remove()"
     >
       ×
@@ -3420,7 +3735,6 @@ function addHorarioForm(button,dados=null){
 
 }
 
-
 function saveOferta(){
 
   const disciplina =
@@ -3440,14 +3754,61 @@ function saveOferta(){
   }
 
 
+  const turmaElements =
+    document.querySelectorAll(
+      '#turmas-form .turma-form'
+    );
+
+
+  if(!turmaElements.length){
+
+    alert(
+      'Adicione pelo menos uma turma.'
+    );
+
+    return;
+
+  }
+
+
   const turmas = [];
 
 
-  document
-    .querySelectorAll(
-      '#turmas-form .turma-form'
-    )
-    .forEach(turma => {
+  let hasError = false;
+
+
+  turmaElements.forEach(
+    (turma, turmaIndex) => {
+
+      if(hasError){
+        return;
+      }
+
+
+      const codigo =
+        turma
+          .querySelector('.turma-codigo')
+          .value
+          .trim();
+
+
+      const professor =
+        turma
+          .querySelector('.turma-professor')
+          .value
+          .trim();
+
+
+      const sala =
+        turma
+          .querySelector('.turma-sala')
+          .value
+          .trim();
+
+
+      /*
+       * Horários
+       */
 
       const horarios = [];
 
@@ -3457,23 +3818,70 @@ function saveOferta(){
         .forEach(h => {
 
           const dia =
-            h.querySelector('.horario-dia').value;
+            h.querySelector(
+              '.horario-dia'
+            ).value;
 
 
           const inicio =
-            h.querySelector('.horario-inicio').value;
+            h.querySelector(
+              '.horario-inicio'
+            ).value;
 
 
           const fim =
-            h.querySelector('.horario-fim').value;
+            h.querySelector(
+              '.horario-fim'
+            ).value;
 
 
-          if(dia && inicio && fim){
+          /*
+           * Se começou a preencher,
+           * precisa completar.
+           */
+
+          if(
+            dia ||
+            inicio ||
+            fim
+          ){
+
+            if(
+              !dia ||
+              !inicio ||
+              !fim
+            ){
+
+              alert(
+                `Complete o horário da turma ${turmaIndex + 1}.`
+              );
+
+              hasError = true;
+
+              return;
+
+            }
+
+
+            if(inicio >= fim){
+
+              alert(
+                `O horário de término deve ser posterior ao início na turma ${turmaIndex + 1}.`
+              );
+
+              hasError = true;
+
+              return;
+
+            }
+
 
             horarios.push({
+
               dia,
               inicio,
               fim
+
             });
 
           }
@@ -3481,41 +3889,74 @@ function saveOferta(){
         });
 
 
+      if(hasError){
+        return;
+      }
+
+
+      if(
+        !codigo &&
+        !professor &&
+        !sala &&
+        !horarios.length
+      ){
+
+        alert(
+          `Preencha as informações da turma ${turmaIndex + 1}.`
+        );
+
+        hasError = true;
+
+        return;
+
+      }
+
+
       turmas.push({
 
-        codigo:
-          turma.querySelector(
-            '.turma-codigo'
-          ).value.trim(),
+        codigo,
 
-        professor:
-          turma.querySelector(
-            '.turma-professor'
-          ).value.trim(),
+        professor,
 
-        sala:
-          turma.querySelector(
-            '.turma-sala'
-          ).value.trim(),
+        sala,
 
         horarios
 
       });
 
-    });
+    }
+  );
 
+
+  if(hasError){
+    return;
+  }
+
+
+  /*
+   * Substitui a oferta anterior
+   * da mesma disciplina.
+   */
 
   ofertas =
     ofertas.filter(
-      x => x.disciplina !== disciplina
+      x =>
+        x.disciplina !== disciplina
     );
 
 
   ofertas.push({
+
     disciplina,
+
     turmas
+
   });
 
+
+  /*
+   * Salva no navegador.
+   */
 
   localStorage.setItem(
     'ufcg_ofertas',
@@ -3528,7 +3969,6 @@ function saveOferta(){
   renderOfertas();
 
 }
-
 
 function renderOfertas(){
 
@@ -3756,15 +4196,8 @@ function nomeDia(dia){
 
 
 /* =====================================================
-   =====================================================
    PLANEJADOR
-   =====================================================
 ===================================================== */
-
-
-/*
- * REGRAS DO CURSO
- */
 
 const PLANNER_RULES = {
 
@@ -3779,15 +4212,6 @@ const PLANNER_RULES = {
 };
 
 
-/*
- * Retorna somente as disciplinas
- * que ainda não foram cursadas.
- *
- * IMPORTANTE:
- *
- * "Quero cursar" NÃO significa cursada.
- */
-
 function getRemainingDisciplines(){
 
   return D.filter(
@@ -3795,21 +4219,6 @@ function getRemainingDisciplines(){
   );
 
 }
-
-
-/*
- * Verifica se uma disciplina pode entrar
- * no próximo período.
- *
- * Os pré-requisitos precisam estar:
- *
- * 1. já cursados anteriormente
- * OU
- * 2. cursados em um período anterior
- *
- * Não pode fazer pré-requisito
- * no mesmo período.
- */
 
 function canTakeInSemester(
   code,
@@ -3834,10 +4243,6 @@ function canTakeInSemester(
 }
 
 
-/*
- * Soma créditos
- */
-
 function getCredits(codes){
 
   return codes.reduce(
@@ -3849,73 +4254,69 @@ function getCredits(codes){
 }
 
 
-/*
- * Conta disciplinas
- */
-
 function getDisciplineCount(codes){
 
   return codes.length;
 
 }
+function getPriorityScore(d){
 
+  const code = d[2];
 
-/*
- * Ordenação inteligente.
- *
- * Primeiro damos prioridade para:
- *
- * 1. disciplinas com maior quantidade
- *    de dependentes;
- *
- * 2. disciplinas mais antigas;
- *
- * 3. disciplinas com pré-requisitos.
- *
- * Isso tende a liberar mais disciplinas
- * nos períodos seguintes.
- */
+  // 1. Quero cursar
+  if(planned.has(code)){
+    return 1000;
+  }
+
+  // 2. É pré-requisito de alguma disciplina
+  // que eu quero cursar
+  const isPrereqOfPlanned =
+    [...planned].some(
+      plannedCode =>
+        getAllPrereqs(plannedCode).has(code)
+    );
+
+  if(isPrereqOfPlanned){
+    return 500;
+  }
+
+  // 3. Disciplina normal
+  return 100;
+}
 
 function plannerPriority(a,b){
 
+  // 1. "Quero cursar" tem prioridade máxima
+  const plannedA = planned.has(a[2]);
+  const plannedB = planned.has(b[2]);
+
+  if(plannedA !== plannedB){
+    return plannedB - plannedA;
+  }
+
+  // 2. Entre as prioridades,
+  // prefere quem libera mais disciplinas
   const depA =
     (dependents[a[2]] || []).length;
 
-
   const depB =
     (dependents[b[2]] || []).length;
-
 
   if(depA !== depB){
     return depB - depA;
   }
 
-
+  // 3. Depois segue a ordem da grade
   if(a[0] !== b[0]){
     return a[0] - b[0];
   }
 
-
+  // 4. Finalmente, quem possui mais pré-requisitos
   return (
     (b[6] || []).length -
     (a[6] || []).length
   );
-
 }
-
-
-/*
- * Escolhe disciplinas para um período.
- *
- * Respeita:
- *
- * - máximo 26 créditos
- * - quantidade desejada
- *
- * Também tenta chegar o mais próximo
- * possível dos 16 créditos.
- */
-
 function chooseSemesterDisciplines(
   available,
   desiredCount
@@ -3930,11 +4331,6 @@ function chooseSemesterDisciplines(
 
   let credits = 0;
 
-
-  /*
-   * Primeiro tenta preencher
-   * até a quantidade desejada.
-   */
 
   for(const d of sorted){
 
@@ -3958,11 +4354,6 @@ function chooseSemesterDisciplines(
 
   }
 
-
-  /*
-   * Se ficou abaixo de 16 créditos,
-   * tenta adicionar mais alguma disciplina.
-   */
 
   if(
     credits <
@@ -4005,10 +4396,6 @@ function chooseSemesterDisciplines(
 }
 
 
-/*
- * Cria uma sugestão completa.
- */
-
 function buildPlan(
   periodosFeitos,
   desiredCount
@@ -4035,15 +4422,24 @@ function buildPlan(
       PLANNER_RULES.MAX_PERIODS
   ){
 
-    const available =
-      remaining.filter(
-        d =>
-          canTakeInSemester(
-            d[2],
-            completedNow
-          )
-      );
+const available =
+  remaining.filter(d => {
 
+    // Disciplina adiada:
+    // fica fora apenas do próximo semestre
+    if(
+      postponed.has(d[2]) &&
+      currentPeriod === periodosFeitos + 1
+    ){
+      return false;
+    }
+
+    return canTakeInSemester(
+      d[2],
+      completedNow
+    );
+
+  });
 
     if(!available.length){
 
@@ -4076,28 +4472,6 @@ function buildPlan(
 
     const credits =
       getCredits(selected);
-
-
-    /*
-     * Se não for o último período,
-     * tentamos manter >= 16 créditos.
-     */
-
-    if(
-      credits <
-      PLANNER_RULES.MIN_CREDITS &&
-      remaining.length >
-        selected.length
-    ){
-
-      /*
-       * Ainda adicionamos o período,
-       * mas marcamos como abaixo do mínimo.
-       * Isso permite que o usuário veja
-       * a situação real.
-       */
-
-    }
 
 
     plans.push({
@@ -4156,27 +4530,10 @@ function buildPlan(
 }
 
 
-/*
- * Cria uma segunda estratégia.
- *
- * Aqui tentamos priorizar as disciplinas
- * mais antigas da grade antes das que
- * liberam mais coisas.
- */
-
 function buildAlternativePlan(
   periodosFeitos,
   desiredCount
 ){
-
-  const originalPriority =
-    plannerPriority;
-
-
-  /*
-   * Estratégia alternativa:
-   * período da grade primeiro.
-   */
 
   const completedNow =
     new Set(completed);
@@ -4199,20 +4556,23 @@ function buildAlternativePlan(
       PLANNER_RULES.MAX_PERIODS
   ){
 
-    const available =
-      remaining
-        .filter(
-          d =>
-            canTakeInSemester(
-              d[2],
-              completedNow
-            )
-        )
-        .sort(
-          (a,b) =>
-            a[0] - b[0]
-        );
+const available =
+  remaining
+    .filter(d => {
 
+      if(
+        postponed.has(d[2]) &&
+        currentPeriod === periodosFeitos + 1
+      ){
+        return false;
+      }
+
+      return canTakeInSemester(
+        d[2],
+        completedNow
+      );
+
+    })
 
     if(!available.length){
 
@@ -4312,13 +4672,6 @@ function buildAlternativePlan(
 }
 
 
-/*
- * Terceira estratégia:
- *
- * tenta priorizar as disciplinas
- * que liberam mais outras.
- */
-
 function buildFastUnlockPlan(
   periodosFeitos,
   desiredCount
@@ -4345,22 +4698,25 @@ function buildFastUnlockPlan(
       PLANNER_RULES.MAX_PERIODS
   ){
 
-    const available =
-      remaining
-        .filter(
-          d =>
-            canTakeInSemester(
-              d[2],
-              completedNow
-            )
-        )
-        .sort(
-          (a,b) =>
-            (dependents[b[2]] || []).length -
-            (dependents[a[2]] || []).length
-        );
+const available =
+  remaining
+    .filter(d => {
 
+      // Disciplina adiada:
+      // não entra no próximo semestre
+      if(
+        postponed.has(d[2]) &&
+        currentPeriod === periodosFeitos + 1
+      ){
+        return false;
+      }
 
+      return canTakeInSemester(
+        d[2],
+        completedNow
+      );
+
+    })
     const selected = [];
 
     let credits = 0;
@@ -4450,17 +4806,6 @@ function buildFastUnlockPlan(
 }
 
 
-/*
- * Calcula uma pontuação.
- *
- * Quanto melhor:
- *
- * - menos períodos;
- * - mais próximo de 16 créditos;
- * - respeita quantidade desejada;
- * - não ultrapassa 26.
- */
-
 function scorePlan(
   plan,
   desiredCount
@@ -4474,20 +4819,11 @@ function scorePlan(
   let score = 0;
 
 
-  /*
-   * Menos períodos é melhor.
-   */
-
   score -=
     plan.plans.length * 100;
 
 
   plan.plans.forEach(semester => {
-
-    /*
-     * Penaliza ficar abaixo de 16
-     * quando ainda há disciplinas.
-     */
 
     if(
       semester.credits <
@@ -4503,11 +4839,6 @@ function scorePlan(
     }
 
 
-    /*
-     * Penaliza muito acima ou abaixo
-     * da quantidade desejada.
-     */
-
     score -=
       Math.abs(
         semester.count -
@@ -4521,10 +4852,6 @@ function scorePlan(
 
 }
 
-
-/*
- * GERA TODAS AS SUGESTÕES
- */
 
 function generatePlanner(){
 
@@ -4543,10 +4870,6 @@ function generatePlanner(){
       ).value
     ) || 1;
 
-
-  /*
-   * Atualiza estatísticas.
-   */
 
   const completedCount =
     completed.size;
@@ -4567,12 +4890,6 @@ function generatePlanner(){
   ).textContent =
     remaining.length;
 
-
-  /*
-   * Se o usuário informou 7 períodos
-   * concluídos, por exemplo,
-   * só pode planejar até o 11º.
-   */
 
   const maxRemaining =
     Math.max(
@@ -4668,10 +4985,6 @@ function generatePlanner(){
   }
 
 
-  /*
-   * Gera três estratégias.
-   */
-
   const candidates = [];
 
 
@@ -4683,12 +4996,18 @@ function generatePlanner(){
 
 
   if(p1.success){
+
     candidates.push({
+
       name:'Equilibrado',
+
       description:
         'Busca equilibrar carga, quantidade de disciplinas e liberação de pré-requisitos.',
+
       plan:p1
+
     });
+
   }
 
 
@@ -4700,12 +5019,18 @@ function generatePlanner(){
 
 
   if(p2.success){
+
     candidates.push({
+
       name:'Por sequência da grade',
+
       description:
         'Prioriza as disciplinas dos períodos mais antigos possíveis.',
+
       plan:p2
+
     });
+
   }
 
 
@@ -4717,18 +5042,20 @@ function generatePlanner(){
 
 
   if(p3.success){
+
     candidates.push({
+
       name:'Desbloqueio rápido',
+
       description:
         'Prioriza disciplinas que liberam mais disciplinas posteriormente.',
+
       plan:p3
+
     });
+
   }
 
-
-  /*
-   * Remove planos praticamente iguais.
-   */
 
   const unique = [];
 
@@ -4755,18 +5082,17 @@ function generatePlanner(){
     ){
 
       unique.push({
+
         ...candidate,
+
         signature
+
       });
 
     }
 
   });
 
-
-  /*
-   * Ordena pelas melhores pontuações.
-   */
 
   unique.sort(
     (a,b) =>
@@ -4804,10 +5130,6 @@ function generatePlanner(){
 
   }
 
-
-  /*
-   * Mostra as sugestões.
-   */
 
   container.innerHTML = '';
 
@@ -4968,11 +5290,6 @@ function generatePlanner(){
           );
 
 
-        /*
-         * Aviso caso a última etapa
-         * tenha menos de 16 créditos.
-         */
-
         const last =
           candidate.plan.plans[
             candidate.plan.plans.length - 1
@@ -5005,6 +5322,7 @@ function generatePlanner(){
             <strong>
               ${last.credits} créditos
             </strong>.
+
             Isso acontece porque restam poucas
             disciplinas para concluir o curso.
 
@@ -5026,7 +5344,15 @@ function generatePlanner(){
     );
 
 }
+function openDisciplineDetails(event, code){
 
+  event.stopPropagation();
+
+  focused = code;
+
+  showPanel(code);
+
+}
 
 /* =====================================================
    INICIALIZAÇÃO
@@ -5039,10 +5365,6 @@ document
     render
   );
 
-
-/*
- * Começa no mapa.
- */
 
 render();
 
