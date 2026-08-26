@@ -2097,7 +2097,6 @@ function status(code){
   }
 
   return 'none';
-
 }
 
 
@@ -2469,7 +2468,7 @@ function setStatus(event, code, newStatus){
 
   event.stopPropagation();
 
-  // Remove o código de todos os estados
+  // Remove a disciplina de todos os estados
   completed.delete(code);
   planned.delete(code);
   postponed.delete(code);
@@ -2483,9 +2482,11 @@ function setStatus(event, code, newStatus){
     planned.add(code);
   }
 
+  if(newStatus === 'postponed'){
+    postponed.add(code);
+  }
 
-
-  // Salva todos os estados
+  // Salva todos os estados no localStorage
   localStorage.setItem(
     'ufcg_completed',
     JSON.stringify([...completed])
@@ -2501,6 +2502,7 @@ function setStatus(event, code, newStatus){
     JSON.stringify([...postponed])
   );
 
+  // Atualiza a interface
   render();
 
   generatePlanner();
