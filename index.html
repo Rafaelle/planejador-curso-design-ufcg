@@ -1564,18 +1564,29 @@ main,
 
         </div>
 
+<div class="planner-stat">
 
-        <div class="planner-stat">
+  <strong id="planner-periodos-restantes">
+    —
+  </strong>
 
-          <strong id="planner-periodos-restantes">
-            0
-          </strong>
+  <span>
+    períodos restantes
+  </span>
 
-          <span>
-            períodos estimados
-          </span>
+</div>
 
-        </div>
+<div class="planner-stat">
+
+  <strong id="planner-periodo-conclusao">
+    —
+  </strong>
+
+  <span>
+    conclusão estimada
+  </span>
+
+</div>
 
       </aside>
 
@@ -4881,6 +4892,10 @@ function generatePlanner(){
     getRemainingDisciplines();
 
 
+  /* =====================================================
+     ATUALIZA INFORMAÇÕES BÁSICAS
+  ===================================================== */
+
   document.getElementById(
     'planner-total-concluidas'
   ).textContent =
@@ -4893,18 +4908,19 @@ function generatePlanner(){
     remaining.length;
 
 
-  const maxRemaining =
-    Math.max(
-      0,
-      PLANNER_RULES.MAX_PERIODS -
-      periodosFeitos
-    );
-
+  /*
+   * Enquanto o plano não for calculado,
+   * os indicadores ficam vazios.
+   */
 
   document.getElementById(
     'planner-periodos-restantes'
-  ).textContent =
-    maxRemaining;
+  ).textContent = '—';
+
+
+  document.getElementById(
+    'planner-periodo-conclusao'
+  ).textContent = '—';
 
 
   const container =
@@ -4913,9 +4929,12 @@ function generatePlanner(){
     );
 
 
+  /* =====================================================
+     VALIDAÇÃO
+  ===================================================== */
+
   if(
-    periodosFeitos <
-      0 ||
+    periodosFeitos < 0 ||
     periodosFeitos >
       PLANNER_RULES.MAX_PERIODS
   ){
@@ -4936,10 +4955,50 @@ function generatePlanner(){
   }
 
 
+  /* =====================================================
+     CURSO CONCLUÍDO
+  ===================================================== */
+
+  if(!remaining.length){
+
+    container.innerHTML = `
+
+      <div class="planner-current-status">
+
+        <strong>🎓 Curso concluído</strong>
+
+        <br><br>
+
+        Todas as disciplinas cadastradas
+        estão marcadas como cursadas.
+
+      </div>
+
+    `;
+
+    document.getElementById(
+      'planner-periodos-restantes'
+    ).textContent = '0';
+
+
+    document.getElementById(
+      'planner-periodo-conclusao'
+    ).textContent =
+      periodosFeitos + 'º';
+
+
+    return;
+
+  }
+
+
+  /* =====================================================
+     LIMITE DE PERÍODOS
+  ===================================================== */
+
   if(
     periodosFeitos >=
-      PLANNER_RULES.MAX_PERIODS &&
-    remaining.length
+      PLANNER_RULES.MAX_PERIODS
   ){
 
     container.innerHTML = `
@@ -4965,30 +5024,16 @@ function generatePlanner(){
   }
 
 
-  if(!remaining.length){
-
-    container.innerHTML = `
-
-      <div class="planner-current-status">
-
-        <strong>🎓 Curso concluído</strong>
-
-        <br><br>
-
-        Todas as disciplinas cadastradas
-        estão marcadas como cursadas.
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
+  /* =====================================================
+     GERA PLANOS
+  ===================================================== */
 
   const candidates = [];
 
+
+  /* -----------------------------------------------------
+     PLANO EQUILIBRADO
+  ----------------------------------------------------- */
 
   const p1 =
     buildPlan(
@@ -5013,6 +5058,10 @@ function generatePlanner(){
   }
 
 
+  /* -----------------------------------------------------
+     PLANO POR SEQUÊNCIA
+  ----------------------------------------------------- */
+
   const p2 =
     buildAlternativePlan(
       periodosFeitos,
@@ -5036,6 +5085,10 @@ function generatePlanner(){
   }
 
 
+  /* -----------------------------------------------------
+     DESBLOQUEIO RÁPIDO
+  ----------------------------------------------------- */
+
   const p3 =
     buildFastUnlockPlan(
       periodosFeitos,
@@ -5058,6 +5111,10 @@ function generatePlanner(){
 
   }
 
+
+  /* =====================================================
+     REMOVE PLANOS DUPLICADOS
+  ===================================================== */
 
   const unique = [];
 
@@ -5096,6 +5153,10 @@ function generatePlanner(){
   });
 
 
+  /* =====================================================
+     ORDENA PLANOS
+  ===================================================== */
+
   unique.sort(
     (a,b) =>
       scorePlan(
@@ -5109,6 +5170,10 @@ function generatePlanner(){
   );
 
 
+  /* =====================================================
+     NENHUM PLANO POSSÍVEL
+  ===================================================== */
+
   if(!unique.length){
 
     container.innerHTML = `
@@ -5116,8 +5181,11 @@ function generatePlanner(){
       <div class="planner-empty">
 
         Não foi possível montar uma sugestão
-        dentro dos limites de ${PLANNER_RULES.MIN_PERIODS}
-        a ${PLANNER_RULES.MAX_PERIODS} períodos.
+        dentro dos limites de
+        ${PLANNER_RULES.MIN_PERIODS}
+        a
+        ${PLANNER_RULES.MAX_PERIODS}
+        períodos.
 
         <br><br>
 
@@ -5132,6 +5200,39 @@ function generatePlanner(){
 
   }
 
+
+  /* =====================================================
+     ATUALIZA OS NOVOS CONTADORES
+  ===================================================== */
+
+  const melhorPlano =
+    unique[0].plan;
+
+
+  const periodosRestantes =
+    melhorPlano.plans.length;
+
+
+  const periodoConclusao =
+    periodosFeitos +
+    periodosRestantes;
+
+
+  document.getElementById(
+    'planner-periodos-restantes'
+  ).textContent =
+    periodosRestantes;
+
+
+  document.getElementById(
+    'planner-periodo-conclusao'
+  ).textContent =
+    periodoConclusao + 'º';
+
+
+  /* =====================================================
+     RENDERIZA SUGESTÕES
+  ===================================================== */
 
   container.innerHTML = '';
 
@@ -5253,6 +5354,11 @@ function generatePlanner(){
                   byCode[code];
 
 
+                if(!d){
+                  return;
+                }
+
+
                 const row =
                   document.createElement(
                     'div'
@@ -5266,10 +5372,13 @@ function generatePlanner(){
                 row.innerHTML = `
 
                   <span>
+
                     <strong>
                       ${d[2]}
                     </strong>
+
                     — ${d[3]}
+
                   </span>
 
                   <span>
@@ -5279,7 +5388,9 @@ function generatePlanner(){
                 `;
 
 
-                semesterEl.appendChild(row);
+                semesterEl.appendChild(
+                  row
+                );
 
               });
 
@@ -5324,6 +5435,8 @@ function generatePlanner(){
             <strong>
               ${last.credits} créditos
             </strong>.
+
+            <br><br>
 
             Isso acontece porque restam poucas
             disciplinas para concluir o curso.
